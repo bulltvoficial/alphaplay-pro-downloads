@@ -1,8 +1,5 @@
 name: Publish Alphaplay Pro installers
 on:
-  push:
-    branches: [main]
-    paths: [.github/workflows/publish-installers.yml]
   workflow_dispatch:
 permissions:
   contents: write
@@ -23,9 +20,9 @@ jobs:
           set -euo pipefail
           mkdir -p installers
           cd installers
-          curl --fail --location --retry 2 --max-time 300 https://alphaplaypro.shop/api/public/d/437866 --output alphaplay-pro-tvbox-1.8.apk
-          curl --fail --location --retry 2 --max-time 300 https://alphaplaypro.shop/api/public/d/553337 --output alphaplay-pro-windows-1.0.0.zip
-          curl --fail --location --retry 2 --max-time 300 https://alphaplaypro.shop/api/public/d/989480 --output alphaplay-tvbox-admin.apk
+          curl --fail --location --retry 2 --max-time 300 https://github.com/bulltvoficial/alphaplay-pro-downloads/releases/download/installers-2026-10/alphaplay-pro-tvbox-1.8.apk --output alphaplay-pro-tvbox-1.8.apk
+          curl --fail --location --retry 2 --max-time 300 https://github.com/bulltvoficial/alphaplay-pro-downloads/releases/download/installers-2026-10/alphaplay-pro-windows-1.0.0.zip --output alphaplay-pro-windows-1.0.0.zip
+          curl --fail --location --retry 2 --max-time 300 https://github.com/bulltvoficial/alphaplay-pro-downloads/releases/download/installers-2026-10/alphaplay-tvbox-admin.apk --output alphaplay-tvbox-admin.apk
           cat > SHA256SUMS <<'SUMS'
           34fadcbd1aa078cda6d4b02442a0242866dc82aacc97d74d297f9045648ba41a  alphaplay-pro-tvbox-1.8.apk
           4ed17160709133a66466c5e5467001de61ebd4ecf037a50cec942773d36baaba  alphaplay-pro-windows-1.0.0.zip
