@@ -1,0 +1,43 @@
+name: Publish Alphaplay Pro installers
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/publish-installers.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-installers
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - name: Download and verify installers
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p installers
+          cd installers
+          curl --fail --location --retry 2 --max-time 300 https://alphaplaypro.shop/api/public/d/437866 --output alphaplay-pro-tvbox-1.8.apk
+          curl --fail --location --retry 2 --max-time 300 https://alphaplaypro.shop/api/public/d/553337 --output alphaplay-pro-windows-1.0.0.zip
+          curl --fail --location --retry 2 --max-time 300 https://alphaplaypro.shop/api/public/d/989480 --output alphaplay-tvbox-admin.apk
+          cat > SHA256SUMS <<'SUMS'
+          34fadcbd1aa078cda6d4b02442a0242866dc82aacc97d74d297f9045648ba41a  alphaplay-pro-tvbox-1.8.apk
+          4ed17160709133a66466c5e5467001de61ebd4ecf037a50cec942773d36baaba  alphaplay-pro-windows-1.0.0.zip
+          fcffa1744fff821d39c638158b63a834ad72e22b56f64297dade30ae3254f0f2  alphaplay-tvbox-admin.apk
+          SUMS
+          sha256sum --check SHA256SUMS
+      - name: Publish release
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=installers-2026-10
+          if ! gh release view "$tag" --repo "$GH_REPO" > /dev/null 2>&1; then
+            gh release create "$tag" --repo "$GH_REPO" --target main --title "Alphaplay Pro — instaladores" --notes "Instaladores oficiais Alphaplay Pro. Confira a integridade no arquivo SHA256SUMS."
+          fi
+          gh release upload "$tag" installers/* --repo "$GH_REPO" --clobber
